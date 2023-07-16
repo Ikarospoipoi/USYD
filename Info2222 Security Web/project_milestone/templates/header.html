@@ -1,0 +1,43 @@
+<head>
+<link rel="stylesheet" type="text/css" href="css/temp.css">
+<script src="js/script_head.js"></script>
+
+<title>Simple Student Templating Solutions</title>
+</head>
+
+<p>
+<ul>
+  <li><a class="active" href="/home">Home</a></li>
+  <li><a href="/login">Login</a></li>
+  <li><a href="/about">About</a></li>
+    <li><a href="/register">Register</a></li>
+    <li><a id="forum">Forum</a></li>
+    <li><a id="CourseDetail">CourseDetail</a></li>
+    <li><a id="CareerAll">CareerDetail</a></li>
+    <script>
+        const check_login = sessionStorage.getItem('username');
+        if (check_login != null){
+            var forum = document.getElementById("forum");
+            var CourseDetail = document.getElementById("CourseDetail");
+            var careerdetail = document.getElementById("CareerAll");
+            console.log(forum);
+            forum.onclick = function () {
+                window.location.href = "/get_message";
+            }
+            CourseDetail.onclick = function () {
+                window.location.href = "/CourseDetail";
+            }
+            careerdetail.onclick = function () {
+                window.location.href = "/CareerHub";
+            }
+        }
+    </script>
+</ul>
+</p>
+<center><h2>Student Chat System</h2>
+
+
+<p>
+</p>
+
+<p>

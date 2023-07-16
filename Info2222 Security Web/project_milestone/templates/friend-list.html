@@ -1,0 +1,86 @@
+
+
+
+<!--?<p>-->
+<!--?<form action="/send" method="post">-->
+<!--?    Name: ${name}<br>-->
+
+<!--?    Message: <input name="username" type="text" />-->
+
+<!--?    <input value="send" type="submit" />-->
+<!--?</form>-->
+<!--?</p>-->
+
+
+
+<form action="/send" method="post">
+    <div class="box">
+        <div class="box">
+            <div class="main">
+                <div class="left">
+                    <div class="friend_table">
+                        <p hidden id="all_friends">${all_names}</p>
+                        <p id="show_all_freind"></p>
+
+                    <script>
+                    var trStr = "";
+                    var all_know = document.getElementById("all_friends").innerHTML;
+                    var know = all_know.split(";");
+                    for(var i = 0; i < know.length; i++){
+                        var tdStr = "";
+                        for (var j = 0; j < 1; j++) {
+                            tdStr += "<td class='table_knowledge_td' id='row' onclick='passReceiver(this.innerHTML)'>"+know[i] +"</td>";
+                        }
+                        trStr += "<tr>" + tdStr + "</tr>";
+                    }
+                    var tableStr = "<table border='1' class='table_knowledge' id='knowledge_table'>" + trStr + "</table>";
+                    document.getElementById("show_all_freind").innerHTML = tableStr;
+
+                    function passReceiver(receiver){
+                        document.getElementById("receiver").value = receiver;
+                        console.log(receiver);
+                    }
+
+                    </script>
+
+
+                    </div>
+                </div>
+                <div class="right">
+                <p id="received_message_title" class="msg-title">Message: from ${name}</p>
+                    <p id="received_message">${message}</p>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="send_table">
+                    <table border="5" class="send_table">
+                      <tr>
+                          <th>Entermessage</th>
+                        <th>receiver</th>
+                          <th>Send</th>
+                      </tr>
+                      <tr>
+                        <td><input type="text" id="msg" name="message" placeholder="please enter message here"></td>
+                        <input hidden type="text" id="sender" name="sender" >
+                        <td><input type="text" name="receiver" id="receiver" placeholder="Please Enter the receiver here"></td>
+                        <input hidden type="text" name="digital_signature" id="ds" value=${digital_signature}>
+                        <td><input value="send" id="send" type="submit" /></td>
+                        <script src="js/compiled.PKE.js"></script>
+                      </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</form>
+
+
+
+
+
+<form action="/get_message" method="post" >
+    <button type="submit">knowledge share Page</button>
+</form>

@@ -1,0 +1,56 @@
+
+
+
+<!--?<p>-->
+<!--?<form action="/send" method="post">-->
+<!--?    Name: ${name}<br>-->
+
+<!--?    Message: <input name="username" type="text" />-->
+
+<!--?    <input value="send" type="submit" />-->
+<!--?</form>-->
+<!--?</p>-->
+
+<table border="5">
+      <tr>
+        <th>FriendList</th>
+
+      </tr>
+      <tr>
+        <td id="friend">${name}</td>
+        <td hidden id="friend_public_key">${friend_public_key}</td>
+      </tr>
+</table>
+
+
+<form action="/send" method="post">
+    <p id="received_message_title">
+        Message: from ${name}
+    </p>
+
+    <p id="received_message">${message}</p>
+
+    <table border="5">
+      <tr>
+          <th>Entermessage</th>
+        <th>receiver</th>
+          <th>Send</th>
+      </tr>
+      <tr>
+        <td><input type="text" id="msg" name="message" placeholder="please enter message here"></td>
+        <input hidden type="text" id="sender" name="sender" >
+        <td><input type="text" name="receiver" placeholder="Please Enter the receiver here"></td>
+        <input hidden type="text" name="digital_signature" id="ds" value=${digital_signature}>
+        <td><input value="send" id="send" type="submit" /></td>
+        <script src="js/compiled.PKE.js"></script>
+      </tr>
+    </table>
+</form>
+
+
+
+
+
+<form action="/get_message" method="post" >
+    <button type="submit">Get Messange</button>
+</form>
