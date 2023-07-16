@@ -1,0 +1,56 @@
+&You may withdraw AUD notes and coins.
+>> ENTER AMOUNT TO WITHDRAW
+8** Press 0 to CANCEL deposit and go back to the menu **
+Withdraw transaction denied.
+
+rSorry, this ATM has insufficient cash available. Please contact an administrator at your nearest XYZ Bank branch.
+$We apologise for any inconvenience.
+Withdraw transaction denied.
+
+rSorry, this ATM has insufficient cash available. Please contact an administrator at your nearest XYZ Bank branch.
+$We apologise for any inconvenience.
+&You may withdraw AUD notes and coins.
+>> ENTER AMOUNT TO WITHDRAW
+8** Press 0 to CANCEL deposit and go back to the menu **
+Withdraw transaction denied.
+
+*You have an insufficient account balance.
+Withdraw transaction denied.
+
+*You have an insufficient account balance.
+||      XYZ Bank - RECEIPT
+||  Transaction ID:     726
+!||  Transaction type:   WITHDRAW
+||  Withdrawal amount:  0.0
+!||  Account balance:    114672.0
+&You may withdraw AUD notes and coins.
+>> ENTER AMOUNT TO WITHDRAW
+8** Press 0 to CANCEL deposit and go back to the menu **
+&You may withdraw AUD notes and coins.
+>> ENTER AMOUNT TO WITHDRAW
+8** Press 0 to CANCEL deposit and go back to the menu **
+6Success! You have withdrawn $10.00 from your account.
+||      XYZ Bank - RECEIPT
+||  Transaction ID:     726
+!||  Transaction type:   WITHDRAW
+||  Withdrawal amount:  10.0
+!||  Account balance:    114662.0
+	5Success! You have withdrawn $0.00 from your account.
+/.8You may only deposit AUD notes. Coins are not accepted.
+/.>> ENTER AMOUNT TO DEPOSIT
+/.8** Press 0 to CANCEL deposit and go back to the menu **
+/.7Success! You have deposited $500.00 into your account.
+/.||      XYZ Bank - RECEIPT
+/.||  Transaction ID:     728
+/. ||  Transaction type:   DEPOSIT
+/.||  Deposit amount:     500.0
+/.!||  Account balance:    115162.0
+/05Success! You have deposited $0.00 into your account.
+/1||      XYZ Bank - RECEIPT
+/1||  Transaction ID:     729
+/1 ||  Transaction type:   DEPOSIT
+/1||  Deposit amount:     0.0
+/1!||  Account balance:    115162.0
+/28You may only deposit AUD notes. Coins are not accepted.
+/2>> ENTER AMOUNT TO DEPOSIT
+/28** Press 0 to CANCEL deposit and go back to the menu **

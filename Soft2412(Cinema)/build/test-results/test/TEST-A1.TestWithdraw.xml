@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="A1.TestWithdraw" tests="6" skipped="0" failures="0" errors="0" timestamp="2021-09-24T06:37:38" hostname="Rachels-MacBook-Air-3.local" time="7.587">
+  <properties/>
+  <testcase name="testdiplaydeny_atm()" classname="A1.TestWithdraw" time="2.518"/>
+  <testcase name="testdiplaydeny()" classname="A1.TestWithdraw" time="1.03"/>
+  <testcase name="testprintreciept()" classname="A1.TestWithdraw" time="0.965"/>
+  <testcase name="testuserinput_valid()" classname="A1.TestWithdraw" time="0.941"/>
+  <testcase name="testdotransaction()" classname="A1.TestWithdraw" time="1.19"/>
+  <testcase name="testdiplaycashdispense()" classname="A1.TestWithdraw" time="0.938"/>
+  <system-out><![CDATA[You may withdraw AUD notes and coins.
+>> ENTER AMOUNT TO WITHDRAW
+** Press 0 to CANCEL deposit and go back to the menu **
+Withdraw transaction denied.
+
+Sorry, this ATM has insufficient cash available. Please contact an administrator at your nearest XYZ Bank branch.
+We apologise for any inconvenience.
+Withdraw transaction denied.
+
+Sorry, this ATM has insufficient cash available. Please contact an administrator at your nearest XYZ Bank branch.
+We apologise for any inconvenience.
+You may withdraw AUD notes and coins.
+>> ENTER AMOUNT TO WITHDRAW
+** Press 0 to CANCEL deposit and go back to the menu **
+Withdraw transaction denied.
+
+You have an insufficient account balance.
+Withdraw transaction denied.
+
+You have an insufficient account balance.
+||      XYZ Bank - RECEIPT
+||  Transaction ID:     726
+||  Transaction type:   WITHDRAW
+||  Withdrawal amount:  0.0
+||  Account balance:    114672.0
+You may withdraw AUD notes and coins.
+>> ENTER AMOUNT TO WITHDRAW
+** Press 0 to CANCEL deposit and go back to the menu **
+You may withdraw AUD notes and coins.
+>> ENTER AMOUNT TO WITHDRAW
+** Press 0 to CANCEL deposit and go back to the menu **
+Success! You have withdrawn $10.00 from your account.
+||      XYZ Bank - RECEIPT
+||  Transaction ID:     726
+||  Transaction type:   WITHDRAW
+||  Withdrawal amount:  10.0
+||  Account balance:    114662.0
+Success! You have withdrawn $0.00 from your account.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

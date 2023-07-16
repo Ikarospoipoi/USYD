@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Withdraw.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">A1</a> &gt; <a href="index.source.html" class="el_package">A1</a> &gt; <span class="el_source">Withdraw.java</span></div><h1>Withdraw.java</h1><pre class="source lang-java linenums">package A1;
+
+import java.util.Scanner;
+
+public class Withdraw extends Transaction {
+    private float amount;
+
+    /**
+     * Constructor for a Withdraw transaction.
+     */
+    public Withdraw(int transactionNum, Customer customer, ATM atm) {
+<span class="fc" id="L12">        super(transactionNum, customer, TransactionType.WITHDRAW, atm);</span>
+<span class="fc" id="L13">    }</span>
+
+    /**
+     * Carries out the Withdraw transaction.
+     */
+    // Main function to withdraw that can be called in main, includes other functions
+    public void doTransaction() {
+        // Contains all logic for withdraw transaction
+
+        //check if customer is inputting numerically
+<span class="fc" id="L23">        float check = this.inputUserAmount(this.getCustomer());</span>
+<span class="pc bpc" id="L24" title="1 of 2 branches missed.">        if(check == -1){</span>
+<span class="nc" id="L25">            return;</span>
+        }
+
+<span class="pc bpc" id="L28" title="1 of 2 branches missed.">        while(check == -2){</span>
+<span class="nc" id="L29">            check = this.inputUserAmount(this.getCustomer());</span>
+        }
+
+
+        // check if the withdrawal amount is supportable
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        while(isCashDivisable(Double.valueOf(this.amount), false) == false){</span>
+<span class="nc" id="L35">            System.out.println(&quot;Please enter a valid AUD cash amount.\n&quot;);</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">            if(this.inputUserAmount(this.getCustomer()) == -1){</span>
+<span class="nc" id="L37">                return;</span>
+            }
+
+        }
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if(this.displayWithdrawDenied()){</span>
+<span class="fc" id="L43">            return;</span>
+        }
+        // At end, add transaction to database
+        else{
+<span class="fc" id="L47">            this.addToDatabase(amount, this.getCustomer().getCardBalance() - amount);</span>
+<span class="fc" id="L48">            this.getCustomer().updateBalance(this.getCustomer().getCardBalance() - amount, this.type);</span>
+<span class="fc" id="L49">            this.displayDispenseCash();</span>
+<span class="fc" id="L50">            this.printReceipt();</span>
+        }
+<span class="fc" id="L52">    }</span>
+
+    /**
+     * Print out receipt
+     */
+    public int printReceipt() {
+<span class="fc" id="L58">        System.out.println(&quot;||      XYZ Bank - RECEIPT&quot;);</span>
+<span class="fc" id="L59">        System.out.println(&quot;||  Transaction ID:     &quot; + String.valueOf(this.transactionNum));</span>
+<span class="fc" id="L60">        System.out.println(&quot;||  Transaction type:   &quot; + this.type);</span>
+<span class="fc" id="L61">        System.out.println(&quot;||  Withdrawal amount:  &quot; + String.valueOf(this.amount));</span>
+<span class="fc" id="L62">        System.out.println(&quot;||  Account balance:    &quot; + String.valueOf(this.getCustomer().getCardBalance()));</span>
+<span class="fc" id="L63">        return -1;</span>
+    }
+
+    /**
+     * Receives an amount from the customer.
+     */
+    // Pass in customer making the transaction and the ATM being used
+    public float inputUserAmount(Customer user) {
+        // Display and get amount
+<span class="fc" id="L72">        System.out.println(&quot;You may withdraw AUD notes and coins.&quot;);</span>
+<span class="fc" id="L73">        System.out.println(&quot;&gt;&gt; ENTER AMOUNT TO WITHDRAW&quot;);</span>
+<span class="fc" id="L74">        System.out.println(&quot;** Press 0 to CANCEL deposit and go back to the menu **&quot;);</span>
+<span class="fc" id="L75">        Scanner withdraw_input = new Scanner(System.in);</span>
+<span class="fc" id="L76">        String amount_String = withdraw_input.nextLine();</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        if (amount_String.equals(&quot;0&quot;)){</span>
+<span class="nc" id="L78">            System.out.println(&quot;CANCEL: Returning to the menu...&quot;);</span>
+<span class="nc" id="L79">            atm.runStandardSystem(customer);</span>
+<span class="nc" id="L80">            return -1;</span>
+        }
+        try{
+<span class="fc" id="L83">            amount = Float.parseFloat(amount_String);</span>
+<span class="fc" id="L84">            return this.amount;</span>
+        }
+<span class="nc" id="L86">        catch (Exception e){</span>
+<span class="nc" id="L87">            System.out.println(&quot;Amount must be numerical.\n&quot;);</span>
+
+        }
+        // Return amount user entered
+<span class="nc" id="L91">        return -2;</span>
+    }
+
+    /**
+     * Displays cash is dispensed to the customer from their account via the ATM.
+     */
+    public int displayDispenseCash() {
+        // Display message
+<span class="fc" id="L99">        System.out.println(String.format(&quot;Success! You have withdrawn $%.2f from your account.&quot;, this.amount));</span>
+<span class="fc" id="L100">        return -1;</span>
+    }
+
+    /**
+     * Displays to the customer that the withdraw was denied and gives the reason.
+     */
+    public boolean displayWithdrawDenied() {
+        // Display reason why it was denied
+<span class="fc" id="L108">        float card_balance = this.getCustomer().getCardBalance();</span>
+<span class="fc" id="L109">        float ATM_balance = (float) this.atm.getATMBalance();</span>
+
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        if(card_balance &lt; this.amount){</span>
+<span class="fc" id="L112">            System.out.println(&quot;Withdraw transaction denied.\n&quot;);</span>
+<span class="fc" id="L113">            System.out.println(&quot;You have an insufficient account balance.&quot;);</span>
+<span class="fc" id="L114">            return true;</span>
+        }
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        if(ATM_balance &lt; this.amount){</span>
+<span class="fc" id="L117">            System.out.println(&quot;Withdraw transaction denied.\n&quot;);</span>
+<span class="fc" id="L118">            System.out.println(&quot;Sorry, this ATM has insufficient cash available. Please contact an administrator at your nearest XYZ Bank branch.&quot;);</span>
+<span class="fc" id="L119">            System.out.println(&quot;We apologise for any inconvenience.&quot;);</span>
+<span class="fc" id="L120">            return true;</span>
+        }
+<span class="fc" id="L122">        return false;</span>
+
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

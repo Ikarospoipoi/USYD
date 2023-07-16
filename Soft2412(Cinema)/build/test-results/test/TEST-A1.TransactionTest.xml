@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="A1.TransactionTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-09-24T06:37:38" hostname="Rachels-MacBook-Air-3.local" time="0.051">
+  <properties/>
+  <testcase name="testisCashDivisable()" classname="A1.TransactionTest" time="0.051"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Customer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">A1</a> &gt; <a href="index.source.html" class="el_package">A1</a> &gt; <span class="el_source">Customer.java</span></div><h1>Customer.java</h1><pre class="source lang-java linenums">package A1;
+
+public class Customer {
+    private String cardNum;
+    private CardStatus cardStatus;
+    private boolean admin;
+    private float cardBalance;
+    private String pin;
+    private String startDate;
+    private String expDate;
+
+    /**
+     * Constructor for a Customer.
+     */
+<span class="fc" id="L15">    public Customer(String cardNum) {</span>
+<span class="fc" id="L16">        this.cardNum = cardNum;</span>
+<span class="fc" id="L17">        this.cardStatus = Crud.getCardStatus(cardNum);</span>
+<span class="fc" id="L18">        this.admin = Crud.isCardAdmin(cardNum);</span>
+<span class="fc" id="L19">        this.cardBalance = Crud.availableFunds(cardNum);</span>
+<span class="fc" id="L20">        this.pin = Crud.getCardPin(cardNum);</span>
+<span class="fc" id="L21">        this.startDate = Crud.getCardStartDate(cardNum);</span>
+<span class="fc" id="L22">        this.expDate = Crud.getCardExpiryDate(cardNum);</span>
+<span class="fc" id="L23">    }</span>
+
+    /**
+     * Returns card number of customer.
+     */
+<span class="fc" id="L28">    public String getCardNum() { return this.cardNum; }</span>
+
+    /**
+     * Returns the card status of customer (either active, lost, stolen or blocked)
+     */
+<span class="fc" id="L33">    public CardStatus getCardStatus() { return this.cardStatus; }</span>
+
+    /**
+     * Returns if the customer is an admin or not.
+     */
+<span class="fc" id="L38">    public boolean isAdmin() { return this.admin; }</span>
+
+    /**
+     * Returns the current card balance of the customer.
+     */
+<span class="fc" id="L43">    public float getCardBalance() { return this.cardBalance; }</span>
+
+    /**
+     * Returns PIN of the customer.
+     */
+<span class="fc" id="L48">    public String getPIN() { return this.pin; }</span>
+
+    /**
+     * Returns start date of the customer's card.
+     */
+<span class="fc" id="L53">    public String getStartDate() { return this.startDate; }</span>
+
+    /**
+     * Returns expiry date of the customer's card.
+     */
+<span class="fc" id="L58">    public String getExpDate() { return this.expDate; }</span>
+
+    /**
+     * Returns whether the given PIN matches that of the customer.
+     */
+<span class="fc" id="L63">    public boolean checkPIN(String inputPIN) { return inputPIN.equals(this.pin); }</span>
+
+    /**
+     * Blocks the customer's card and updates the data base.
+     */
+    public void blockCard() {
+        // Update database to blocked card status
+<span class="fc" id="L70">        Crud.updateCardStatus(getCardNum(), &quot;Blocked&quot;);</span>
+<span class="fc" id="L71">        this.cardStatus = CardStatus.BLOCKED;</span>
+<span class="fc" id="L72">        return;</span>
+    }
+
+    /**
+     * Updates the current balance of the customer in the database.
+     */
+    public void updateBalance(float amount, TransactionType type) {
+<span class="fc" id="L79">        this.cardBalance = amount;</span>
+        // Update database...
+<span class="fc" id="L81">        Crud.updateCustomer(this.cardNum, type, amount);</span>
+<span class="fc" id="L82">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

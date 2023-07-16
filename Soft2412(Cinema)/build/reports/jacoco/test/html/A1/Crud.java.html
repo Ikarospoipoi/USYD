@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Crud.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">A1</a> &gt; <a href="index.source.html" class="el_package">A1</a> &gt; <span class="el_source">Crud.java</span></div><h1>Crud.java</h1><pre class="source lang-java linenums">package A1;
+import java.sql.*;
+
+<span class="nc" id="L4">public class Crud{</span>
+
+	// Previously called card_valid
+	public static int cardExists(String card_number) {
+<span class="fc" id="L8">		Connection conn = null;</span>
+<span class="fc" id="L9">		ResultSet resultSet = null;</span>
+<span class="fc" id="L10">		int result = 0;</span>
+		try {
+			// Connect to DB
+<span class="fc" id="L13">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L14">			Statement statement = conn.createStatement();</span>
+			// Create and Run Query
+<span class="fc" id="L16">			String card_exists_query = &quot;Select COUNT(*) FROM xyzBank.dbo.customers WHERE card_number LIKE '&quot; + card_number + &quot;'&quot;;</span>
+<span class="fc" id="L17">			resultSet = statement.executeQuery(card_exists_query);</span>
+			// Print Result
+<span class="fc bfc" id="L19" title="All 2 branches covered.">			while(resultSet.next()) {</span>
+<span class="fc" id="L20">				int i = Integer.parseInt(resultSet.getString(1));</span>
+<span class="fc" id="L21">				result = i;</span>
+<span class="fc" id="L22">			}</span>
+		}
+<span class="nc" id="L24">		catch (SQLException e){</span>
+<span class="nc" id="L25">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L28" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L29">					conn.close();</span>
+				}
+<span class="nc" id="L31">			} catch (SQLException ex){</span>
+<span class="nc" id="L32">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L33">			}</span>
+		}
+<span class="fc" id="L35">		return result;</span>
+	}
+
+	public static CardStatus getCardStatus(String card_number){
+<span class="fc" id="L39">		Connection conn = null;</span>
+<span class="fc" id="L40">		ResultSet resultSet = null;</span>
+<span class="fc" id="L41">		String result = null;</span>
+		try {
+			// Connect to DB
+<span class="fc" id="L44">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L45">			Statement statement = conn.createStatement();</span>
+			// Create and Run Query
+<span class="fc" id="L47">			String card_status_query = &quot;Select card_status FROM xyzBank.dbo.customers WHERE card_number LIKE '&quot; + card_number + &quot;'&quot;;</span>
+<span class="fc" id="L48">			resultSet = statement.executeQuery(card_status_query);</span>
+			// Print Result
+<span class="fc bfc" id="L50" title="All 2 branches covered.">			while(resultSet.next()) {</span>
+<span class="fc" id="L51">				result = (resultSet.getString(1));</span>
+			}
+		}
+<span class="nc" id="L54">		catch (SQLException e){</span>
+<span class="nc" id="L55">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L59">					conn.close();</span>
+				}
+<span class="nc" id="L61">			} catch (SQLException ex){</span>
+<span class="nc" id="L62">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L63">			}</span>
+		}
+<span class="fc" id="L65">		result = result.toUpperCase();</span>
+		// Return a CardStatus enum
+<span class="fc bfc" id="L67" title="All 2 branches covered.">		if (result.equals(&quot;ACTIVE&quot;)) {</span>
+<span class="fc" id="L68">			return CardStatus.ACTIVE;</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">		} else if (result.equals(&quot;BLOCKED&quot;)) {</span>
+<span class="fc" id="L70">			return CardStatus.BLOCKED;</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">		} else if (result.equals(&quot;LOST&quot;)) {</span>
+<span class="fc" id="L72">			return CardStatus.LOST;</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">		} else if (result.equals(&quot;STOLEN&quot;)) {</span>
+<span class="fc" id="L74">			return CardStatus.STOLEN;</span>
+		}
+<span class="nc" id="L76">		return null;</span>
+
+	}
+
+	public static boolean isCardAdmin(String card_number){
+<span class="fc" id="L81">		Connection conn = null;</span>
+<span class="fc" id="L82">		ResultSet resultSet = null;</span>
+<span class="fc" id="L83">		boolean result = false;</span>
+		try {
+			// Connect to DB
+<span class="fc" id="L86">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L87">			Statement statement = conn.createStatement();</span>
+			// Create and Run Query
+<span class="fc" id="L89">			String is_admin_query = &quot;Select Is_Admin FROM xyzBank.dbo.customers WHERE card_number LIKE '&quot; + card_number + &quot;'&quot;;</span>
+<span class="fc" id="L90">			resultSet = statement.executeQuery(is_admin_query);</span>
+			// Print Result
+<span class="fc bfc" id="L92" title="All 2 branches covered.">			while(resultSet.next()) {</span>
+<span class="fc" id="L93">				int i = Integer.parseInt(resultSet.getString(1));</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">				if(i==1){</span>
+<span class="fc" id="L95">					result = true;</span>
+				}
+				else{
+<span class="fc" id="L98">					result = false;</span>
+				}
+<span class="fc" id="L100">			}</span>
+		}
+<span class="nc" id="L102">		catch (SQLException e){</span>
+<span class="nc" id="L103">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L107">					conn.close();</span>
+				}
+<span class="nc" id="L109">			} catch (SQLException ex){</span>
+<span class="nc" id="L110">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L111">			}</span>
+		}
+<span class="fc" id="L113">		return result;</span>
+
+	}
+
+	public static float availableFunds(String card_number){
+<span class="fc" id="L118">		Connection conn = null;</span>
+<span class="fc" id="L119">		ResultSet resultSet = null;</span>
+<span class="fc" id="L120">		float result = 0;</span>
+		try {
+			// Connect to DB
+<span class="fc" id="L123">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L124">			Statement statement = conn.createStatement();</span>
+			// Create and Run Query
+<span class="fc" id="L126">			String available_funds_query = &quot;Select available_funds FROM xyzBank.dbo.customers WHERE card_number LIKE '&quot; + card_number + &quot;'&quot;;</span>
+<span class="fc" id="L127">			resultSet = statement.executeQuery(available_funds_query);</span>
+			// Print Result
+<span class="fc bfc" id="L129" title="All 2 branches covered.">			while(resultSet.next()) {</span>
+<span class="fc" id="L130">				result = Float.valueOf(resultSet.getString(1));</span>
+
+			}
+		}
+<span class="nc" id="L134">		catch (SQLException e){</span>
+<span class="nc" id="L135">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L139">					conn.close();</span>
+				}
+<span class="nc" id="L141">			} catch (SQLException ex){</span>
+<span class="nc" id="L142">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L143">			}</span>
+		}
+<span class="fc" id="L145">		return result;</span>
+
+	}
+
+	public static String getCardPin(String card_number){
+<span class="fc" id="L150">		Connection conn = null;</span>
+<span class="fc" id="L151">		ResultSet resultSet = null;</span>
+<span class="fc" id="L152">		String result = null;</span>
+		try {
+			// Connect to DB
+<span class="fc" id="L155">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L156">			Statement statement = conn.createStatement();</span>
+			// Create and Run Query
+<span class="fc" id="L158">			String get_card_pin_query = &quot;Select pin FROM xyzBank.dbo.customers WHERE card_number LIKE '&quot; + card_number + &quot;'&quot;;</span>
+<span class="fc" id="L159">			resultSet = statement.executeQuery(get_card_pin_query);</span>
+			// Print Result
+<span class="fc bfc" id="L161" title="All 2 branches covered.">			while(resultSet.next()) {</span>
+<span class="fc" id="L162">				result = (resultSet.getString(1));</span>
+
+			}
+		}
+<span class="nc" id="L166">		catch (SQLException e){</span>
+<span class="nc" id="L167">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L171">					conn.close();</span>
+				}
+<span class="nc" id="L173">			} catch (SQLException ex){</span>
+<span class="nc" id="L174">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L175">			}</span>
+		}
+<span class="fc" id="L177">		return result;</span>
+
+	}
+
+
+	public static String getCardStartDate(String card_number){
+<span class="fc" id="L183">		Connection conn = null;</span>
+<span class="fc" id="L184">		ResultSet resultSet = null;</span>
+<span class="fc" id="L185">		String result = null;</span>
+		try {
+			// Connect to DB
+<span class="fc" id="L188">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L189">			Statement statement = conn.createStatement();</span>
+			// Create and Run Query
+<span class="fc" id="L191">			String get_card_start_date_query = &quot;Select start_date FROM xyzBank.dbo.customers WHERE card_number LIKE '&quot; + card_number + &quot;'&quot;;</span>
+<span class="fc" id="L192">			resultSet = statement.executeQuery(get_card_start_date_query);</span>
+			// Print Result
+<span class="fc bfc" id="L194" title="All 2 branches covered.">			while(resultSet.next()) {</span>
+<span class="fc" id="L195">				result = (resultSet.getString(1));</span>
+
+			}
+		}
+<span class="nc" id="L199">		catch (SQLException e){</span>
+<span class="nc" id="L200">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L204">					conn.close();</span>
+				}
+<span class="nc" id="L206">			} catch (SQLException ex){</span>
+<span class="nc" id="L207">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L208">			}</span>
+		}
+<span class="fc" id="L210">		return result;</span>
+
+	}
+
+	public static String getCardExpiryDate(String card_number){
+<span class="fc" id="L215">		Connection conn = null;</span>
+<span class="fc" id="L216">		ResultSet resultSet = null;</span>
+<span class="fc" id="L217">		String result = null;</span>
+		try {
+			// Connect to DB
+<span class="fc" id="L220">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L221">			Statement statement = conn.createStatement();</span>
+			// Create and Run Query
+<span class="fc" id="L223">			String get_card_exp_date_query = &quot;Select exp_date FROM xyzBank.dbo.customers WHERE card_number LIKE '&quot; + card_number + &quot;'&quot;;</span>
+<span class="fc" id="L224">			resultSet = statement.executeQuery(get_card_exp_date_query);</span>
+			// Print Result
+<span class="fc bfc" id="L226" title="All 2 branches covered.">			while(resultSet.next()) {</span>
+<span class="fc" id="L227">				result = (resultSet.getString(1));</span>
+
+			}
+		}
+<span class="nc" id="L231">		catch (SQLException e){</span>
+<span class="nc" id="L232">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L236">					conn.close();</span>
+				}
+<span class="nc" id="L238">			} catch (SQLException ex){</span>
+<span class="nc" id="L239">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L240">			}</span>
+		}
+<span class="fc" id="L242">		return result;</span>
+
+	}
+
+	public static float getATMBalance(String atmId){
+<span class="fc" id="L247">		Connection conn = null;</span>
+<span class="fc" id="L248">		ResultSet resultSet = null;</span>
+<span class="fc" id="L249">		float result = 0;</span>
+		try {
+			// Connect to DB
+<span class="fc" id="L252">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L253">			Statement statement = conn.createStatement();</span>
+			// Create and Run Query
+<span class="fc" id="L255">			String get_balance_query = &quot;Select atm_balance FROM xyzBank.dbo.atm WHERE atm_id = &quot; + atmId;</span>
+<span class="fc" id="L256">			resultSet = statement.executeQuery(get_balance_query);</span>
+			// Print Result
+<span class="fc bfc" id="L258" title="All 2 branches covered.">			while(resultSet.next()) {</span>
+<span class="fc" id="L259">				result = Float.valueOf(resultSet.getString(1));</span>
+
+			}
+		}
+<span class="nc" id="L263">		catch (SQLException e){</span>
+<span class="nc" id="L264">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L268">					conn.close();</span>
+				}
+<span class="nc" id="L270">			} catch (SQLException ex){</span>
+<span class="nc" id="L271">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L272">			}</span>
+		}
+<span class="fc" id="L274">		return result;</span>
+	}
+
+	public static void updateATMBalance(String atmId, double adjustBy){
+<span class="fc" id="L278">		Connection conn = null;</span>
+
+		try {
+			// Connect to DB
+<span class="fc" id="L282">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L283">			Statement statement = conn.createStatement();</span>
+			// Write Query and Update Database
+<span class="fc" id="L285">			String update_query = &quot;UPDATE xyzBank.dbo.atm SET atm_balance = &quot; + adjustBy + &quot; WHERE atm_id = &quot; + atmId;</span>
+<span class="fc" id="L286">			statement.executeUpdate(update_query);</span>
+
+		}
+<span class="nc" id="L289">		catch (SQLException e){</span>
+<span class="nc" id="L290">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L293" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L294">					conn.close();</span>
+				}
+<span class="nc" id="L296">			} catch (SQLException ex){</span>
+<span class="nc" id="L297">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L298">			}</span>
+		}
+
+
+<span class="fc" id="L302">	}</span>
+
+	public static int rowsinTransactionTable(){
+<span class="fc" id="L305">		Connection conn = null;</span>
+<span class="fc" id="L306">		ResultSet resultSet = null;</span>
+<span class="fc" id="L307">		int no_rows = 0;</span>
+		try {
+			// Connect to DB
+<span class="fc" id="L310">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L311">			Statement statement = conn.createStatement();</span>
+			// Create and Run Query
+<span class="fc" id="L313">			String get_lastTransactionID = &quot;Select count(*) FROM xyzBank.dbo.transactions&quot;;</span>
+<span class="fc" id="L314">			resultSet = statement.executeQuery(get_lastTransactionID);</span>
+			// Print Result
+<span class="fc bfc" id="L316" title="All 2 branches covered.">			while(resultSet.next()) {</span>
+<span class="fc" id="L317">				no_rows = Integer.parseInt(resultSet.getString(1));</span>
+			}
+		}
+<span class="nc" id="L320">		catch (SQLException e){</span>
+<span class="nc" id="L321">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L324" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L325">					conn.close();</span>
+				}
+<span class="nc" id="L327">			} catch (SQLException ex){</span>
+<span class="nc" id="L328">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L329">			}</span>
+		}
+<span class="fc" id="L331">		return no_rows;</span>
+
+	}
+
+	public static int lastTransactionNumber(String atmId){
+<span class="fc" id="L336">		Connection conn = null;</span>
+<span class="fc" id="L337">		ResultSet resultSet = null;</span>
+<span class="fc" id="L338">		int result = 0;</span>
+		try {
+			// Connect to DB
+<span class="fc" id="L341">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L342">			Statement statement = conn.createStatement();</span>
+			// Create and Run Query
+<span class="fc" id="L344">			String get_lastTransactionID = &quot;Select TOP 1 transaction_id FROM xyzBank.dbo.transactions Order By transaction_id DESC&quot;;</span>
+<span class="fc" id="L345">			resultSet = statement.executeQuery(get_lastTransactionID);</span>
+			// Print Result
+<span class="fc bfc" id="L347" title="All 2 branches covered.">			while(resultSet.next()) {</span>
+<span class="fc" id="L348">				result = Integer.parseInt(resultSet.getString(1));</span>
+			}
+		}
+<span class="nc" id="L351">		catch (SQLException e){</span>
+<span class="nc" id="L352">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L355" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L356">					conn.close();</span>
+				}
+<span class="nc" id="L358">			} catch (SQLException ex){</span>
+<span class="nc" id="L359">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L360">			}</span>
+		}
+<span class="fc" id="L362">		return result;</span>
+
+	}
+
+	public static void updateTransaction(int id, TransactionType type, double altered_amount, double new_balance, String atmId){
+<span class="fc" id="L367">		Connection conn = null;</span>
+
+		try {
+			// Connect to DB
+<span class="fc" id="L371">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+<span class="fc" id="L372">			Statement statement = conn.createStatement();</span>
+			// Write Query and Update Database
+<span class="fc bfc" id="L374" title="All 2 branches covered.">			if(type == TransactionType.CHECKBALANCE){</span>
+<span class="fc" id="L375">				String update_query = &quot;INSERT INTO xyzBank.dbo.transactions &quot; +</span>
+						&quot;(transaction_type, account_balance, atm_id) &quot; +
+						&quot;VALUES ( &quot; + &quot;'BALANCE CHECK', &quot; + new_balance + &quot;, &quot; + atmId + &quot;)&quot;;
+<span class="fc" id="L378">				statement.executeUpdate(update_query);</span>
+<span class="fc" id="L379">			}</span>
+<span class="fc bfc" id="L380" title="All 2 branches covered.">			else if(type == TransactionType.DEPOSIT){</span>
+<span class="fc" id="L381">				String update_query = &quot;INSERT INTO xyzBank.dbo.transactions &quot; +</span>
+						&quot;(transaction_type, amount_deposited, account_balance, atm_id) &quot; +
+						&quot;VALUES ( &quot; + &quot;'DEPOSIT', &quot; + altered_amount + &quot;, &quot; + new_balance + &quot;, &quot; + atmId + &quot;)&quot;;
+<span class="fc" id="L384">				statement.executeUpdate(update_query);</span>
+<span class="fc" id="L385">			}</span>
+<span class="pc bpc" id="L386" title="1 of 2 branches missed.">			else if(type == TransactionType.WITHDRAW){</span>
+<span class="fc" id="L387">				String update_query = &quot;INSERT INTO xyzBank.dbo.transactions &quot; +</span>
+						&quot;(transaction_type, amount_withdrawn, account_balance, atm_id) &quot; +
+						&quot;VALUES ( &quot; + &quot;'WITHDRAW', &quot; + altered_amount + &quot;, &quot; + new_balance + &quot;, &quot; + atmId + &quot;)&quot;;
+<span class="fc" id="L390">				statement.executeUpdate(update_query);</span>
+			}
+
+		}
+<span class="nc" id="L394">		catch (SQLException e){</span>
+<span class="nc" id="L395">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally{
+			try{
+<span class="pc bpc" id="L398" title="1 of 2 branches missed.">				if (conn!=null){</span>
+<span class="fc" id="L399">					conn.close();</span>
+				}
+<span class="nc" id="L401">			} catch (SQLException ex){</span>
+<span class="nc" id="L402">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L403">			}</span>
+		}
+
+
+<span class="fc" id="L407">	}</span>
+
+	public static void updateCustomer(String cardNum, TransactionType type, float amount){
+<span class="fc" id="L410">		Connection conn = null;</span>
+
+		try {
+			// Connect to DB
+<span class="fc" id="L414">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+
+			// Write Query and Update Database
+<span class="fc" id="L417">			String update_query = &quot;UPDATE xyzBank.dbo.customers &quot; + &quot;SET available_funds = &quot; + amount + &quot;where card_number = &quot; + cardNum + &quot;;&quot;;</span>
+<span class="fc" id="L418">			Statement statement = conn.createStatement();</span>
+<span class="fc" id="L419">			statement.executeUpdate(update_query);</span>
+<span class="fc" id="L420">			conn.close();</span>
+
+
+		}
+<span class="nc" id="L424">		catch (SQLException e){</span>
+<span class="nc" id="L425">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally {
+			try {
+<span class="pc bpc" id="L428" title="1 of 2 branches missed.">				if (conn != null) {</span>
+<span class="fc" id="L429">					conn.close();</span>
+				}
+<span class="nc" id="L431">			} catch (SQLException ex) {</span>
+<span class="nc" id="L432">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L433">			}</span>
+		}
+<span class="fc" id="L435">	}</span>
+
+	public static void updateCardStatus(String cardNumber, String cardStatus){
+<span class="fc" id="L438">		Connection conn = null;</span>
+
+		try {
+			// Connect to DB
+<span class="fc" id="L442">			conn = DriverManager.getConnection(&quot;jdbc:sqlserver://soft2412.cyg3iolyiokd.ap-southeast-2.rds.amazonaws.com:1433;&quot;, &quot;admin&quot;, &quot;gr0up!wo&quot;);</span>
+
+			// Write Query and Update Database
+<span class="fc" id="L445">			String update_query = &quot;UPDATE xyzBank.dbo.customers &quot; + &quot;SET card_status = '&quot; + cardStatus + &quot;' where card_number = &quot; + cardNumber + &quot;;&quot;;</span>
+<span class="fc" id="L446">			Statement statement = conn.createStatement();</span>
+<span class="fc" id="L447">			statement.executeUpdate(update_query);</span>
+<span class="fc" id="L448">			conn.close();</span>
+
+
+		}
+<span class="nc" id="L452">		catch (SQLException e){</span>
+<span class="nc" id="L453">			throw new Error(&quot;Problem&quot;, e);</span>
+		}finally {
+			try {
+<span class="pc bpc" id="L456" title="1 of 2 branches missed.">				if (conn != null) {</span>
+<span class="fc" id="L457">					conn.close();</span>
+				}
+<span class="nc" id="L459">			} catch (SQLException ex) {</span>
+<span class="nc" id="L460">				System.out.println(ex.getMessage());</span>
+<span class="fc" id="L461">			}</span>
+		}
+<span class="fc" id="L463">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

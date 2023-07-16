@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ATM.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">A1</a> &gt; <a href="index.source.html" class="el_package">A1</a> &gt; <span class="el_source">ATM.java</span></div><h1>ATM.java</h1><pre class="source lang-java linenums">package A1;
+
+import java.util.*;
+public class ATM {
+    private String atmId;
+    private double balance;
+    private int nextTransactionNum;
+
+<span class="fc" id="L9">    public ATM(String atmId) {</span>
+<span class="fc" id="L10">        this.atmId = atmId;</span>
+<span class="fc" id="L11">        this.balance = Crud.getATMBalance(atmId);</span>
+<span class="pc bpc" id="L12" title="1 of 2 branches missed.">        if(Crud.rowsinTransactionTable() == 0){</span>
+<span class="nc" id="L13">            this.nextTransactionNum = 1;</span>
+        }
+        else{
+<span class="fc" id="L16">            this.nextTransactionNum = Crud.rowsinTransactionTable() + 1;</span>
+        }
+<span class="fc" id="L18">    }</span>
+
+    public String getATMid() {
+<span class="fc" id="L21">        return this.atmId;</span>
+    }
+
+    public double getATMBalance() {
+<span class="fc" id="L25">        return this.balance;</span>
+    }
+
+    /**
+     * Returns the ATM's next transaction number and updates this attribute in the ATM.
+    */
+    public int getNextTransactionNum() {
+<span class="fc" id="L32">        int oldNum = this.nextTransactionNum; // Save old value to return</span>
+<span class="fc" id="L33">        this.nextTransactionNum++; // Increment next transaction number (assumes transaction number definitely gets used)</span>
+<span class="fc" id="L34">        return oldNum; //should this not return the incremented tractionNUm? no - the attribute is the next number to be used so this assumes when it's retrieved (only to directly set the transaction number of a Transaction) it's used. So it increments ready for the next time it is used.</span>
+    }
+
+    /**
+     * Returns the ATM's next transaction number and updates this attribute in the ATM.
+     * amount may be negative or positive.
+    */
+    public void updateATMBalance(double amount) {
+<span class="fc" id="L42">        this.balance += amount;</span>
+<span class="fc" id="L43">        Crud.updateATMBalance(this.atmId, this.balance);</span>
+<span class="fc" id="L44">    }</span>
+
+    /**
+     * Asks for the user's card number and returns it.
+    */
+    public String userCardNum() {
+        // Take Card Number From User input
+<span class="fc" id="L51">        Scanner CardNumInput = new Scanner(System.in);</span>
+<span class="fc" id="L52">        System.out.println(&quot;\n========= CARD NUMBER =========&quot;);</span>
+<span class="fc" id="L53">        System.out.println(&quot;&gt;&gt; ENTER 5 DIGIT CARD NUMBER&quot;);</span>
+<span class="fc" id="L54">        return CardNumInput.nextLine();</span>
+    }
+
+    /**
+     * Checks if the given card number is valid.
+     * Returns the corresponding Customer if valid and null if invalid.
+    */
+    public Customer initCustomer(String cardNum) {
+        // Check card exists
+<span class="fc" id="L63">        int exists = Crud.cardExists(cardNum);</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (exists != 1) {</span>
+<span class="fc" id="L65">            return null;</span>
+        }
+
+        // Check card is used after its start date and is used before its expiry date (compare with current date)
+<span class="fc" id="L69">        Calendar calendar = Calendar.getInstance();</span>
+<span class="fc" id="L70">        int month = calendar.get(Calendar.MONTH) + 1;</span>
+<span class="fc" id="L71">        int year = calendar.get(Calendar.YEAR);</span>
+<span class="fc" id="L72">        int date = (year * 12) + month;</span>
+
+<span class="fc" id="L74">        String start_date = Crud.getCardStartDate(cardNum);</span>
+<span class="fc" id="L75">        String sub_start_year = start_date.substring(2);</span>
+<span class="fc" id="L76">        String sub_start_month = start_date.substring(0, 2);</span>
+<span class="fc" id="L77">        int start_date_int = ((2000+Integer.valueOf(sub_start_year)) * 12) + Integer.valueOf(sub_start_month);</span>
+
+<span class="fc" id="L79">        String expiry_date = Crud.getCardExpiryDate(cardNum);</span>
+<span class="fc" id="L80">        String sub_expiry_year = expiry_date.substring(2);</span>
+<span class="fc" id="L81">        String sub_expiry_month = expiry_date.substring(0, 2);</span>
+<span class="fc" id="L82">        int expir_date_int = ((2000+Integer.valueOf(sub_expiry_year)) * 12) + Integer.valueOf(sub_expiry_month);</span>
+
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        if (start_date_int &gt; date){</span>
+<span class="fc" id="L85">            System.out.println(&quot;You are attempting to use this card before its start date.&quot;);</span>
+<span class="fc" id="L86">            return null;</span>
+        }
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        if (expir_date_int &lt; date){</span>
+<span class="fc" id="L89">            System.out.println(&quot;You are attempting to use this card after it has expired.&quot;);</span>
+<span class="fc" id="L90">            return null;</span>
+        }
+        // Create Customer object
+<span class="fc" id="L93">        Customer customer = new Customer(cardNum);</span>
+        // Check card is not lost or stolen
+<span class="fc bfc" id="L95" title="All 4 branches covered.">        if (customer.getCardStatus() == CardStatus.LOST || customer.getCardStatus() == CardStatus.STOLEN) {</span>
+<span class="fc" id="L96">            System.out.println(&quot;This card has been detected as reported as lost or stolen. This card has been confiscated.&quot;);</span>
+<span class="fc" id="L97">            System.out.println(&quot;We are sorry for any inconvenience. Please contact your nearest XYZ Bank branch.&quot;);</span>
+<span class="fc" id="L98">            return null;</span>
+        }
+        // Card is valid so return the newly created Customer object
+<span class="fc" id="L101">        return customer;</span>
+    }
+
+    /*
+    Validate Pin contains 3 features:
+    1. Take input(PIN) from user.
+    2. No more than three attempts.(Exit program if more than 3 attempts. Will take 3 inputs in total.)
+    3. Validate the input with the PIN from customer object.()
+     */
+    public boolean validatePIN(Customer new_customer){
+<span class="fc" id="L111">        System.out.println(&quot;\n============= PIN =============&quot;);</span>
+<span class="fc" id="L112">        Scanner pinInput = new Scanner(System.in);  // Create a Scanner object</span>
+<span class="fc" id="L113">        int attempt = 1; // First attempt number</span>
+
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        while(attempt &lt;=3 ){</span>
+
+            // Display different message while making different attempt.
+<span class="pc bpc" id="L118" title="1 of 4 branches missed.">            switch (attempt){</span>
+                // First attempt
+                case 1:
+<span class="fc" id="L121">                    System.out.println(&quot;Please enter your PIN. After 3 incorrect attempts your card will be blocked.&quot;);</span>
+<span class="fc" id="L122">                    break;</span>
+                // Second attempt
+                case 2:
+<span class="fc" id="L125">                    System.out.println(&quot;Incorrect PIN given. Please enter your PIN again.&quot;);</span>
+<span class="fc" id="L126">                    break;</span>
+                // Third attempt
+                case 3:
+<span class="fc" id="L129">                    System.out.println(&quot;Incorrect PIN given. Please enter your PIN again. Reminder: If this attempt fails, your card will be blocked.&quot;);</span>
+                    break;
+            }
+<span class="fc" id="L132">            System.out.printf(&quot;Attempts left: %d%n&quot;, 4 - attempt);</span>
+<span class="fc" id="L133">            System.out.println(&quot;&gt;&gt; ENTER 4 DIGIT PIN&quot;);</span>
+
+            /*
+            Get PIN from user input
+             */
+            //Read user input
+<span class="fc" id="L139">            String pin = pinInput.nextLine();</span>
+
+            // Check if a match, match return true, if not match return false.
+<span class="fc" id="L142">            boolean match = new_customer.checkPIN(pin);</span>
+
+            //Validation
+            //Pin matched, break the loop.
+<span class="fc bfc" id="L146" title="All 2 branches covered.">            if(match){</span>
+<span class="fc" id="L147">                System.out.println(&quot;Your PIN matches and your card is valid.&quot;);</span>
+<span class="fc" id="L148">                return true;</span>
+            }
+
+            //while loop count
+<span class="fc" id="L152">            attempt++;</span>
+<span class="fc" id="L153">        }</span>
+        // If more than three attempts, Block card and Exit.
+        // Block card
+<span class="fc" id="L156">        new_customer.blockCard();</span>
+<span class="fc" id="L157">        System.out.println(&quot;Sorry, you have exceeded your 3 attempts to enter your PIN. Your card has been blocked.\nPlease contact your nearest XYZ Bank branch.&quot;);</span>
+<span class="fc" id="L158">        return false;</span>
+    }
+
+    /*
+    Allows the admin to perform routine maintenance.
+    Returns true if cash was added, otherwise returns false.
+     */
+    public boolean runAdminSystem(){
+    //Admin full system,no output.
+<span class="fc" id="L167">        Scanner scan = new Scanner(System.in);// Create scanner obj</span>
+<span class="fc" id="L168">        System.out.println(&quot;\n============ ADMIN ============&quot;);</span>
+<span class="fc" id="L169">        System.out.println(&quot;\nYou have entered the Admin System.\n&quot;); // Welcome message(Only appear once)</span>
+        // Ask for how much cash to be added to the ATM
+<span class="fc" id="L171">        System.out.println(&quot;Routine maintenance: How much cash are you adding to the system?&quot;);</span>
+
+        //Loop until admin put only note into the ATM
+<span class="fc" id="L174">        int counter = 0;</span>
+<span class="fc" id="L175">        double cashAdded = -1;</span>
+        do {
+<span class="fc bfc" id="L177" title="All 2 branches covered.">            if (counter &gt; 0) {</span>
+                //Print error message
+<span class="fc" id="L179">                System.out.println(&quot;Please enter a valid AUD cash amount.&quot;);</span>
+            }
+            // Print message
+<span class="fc" id="L182">            System.out.println(&quot;&gt;&gt; ENTER CASH AMOUNT&quot;);</span>
+<span class="fc" id="L183">            System.out.println(&quot;** Press 0 to CANCEL and eject your card **&quot;);</span>
+            // Get input
+<span class="fc" id="L185">            cashAdded = scan.nextDouble();</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">            if(cashAdded == 0){</span>
+<span class="fc" id="L187">                System.out.println(&quot;No cash was added.&quot;);</span>
+<span class="fc" id="L188">                ejectCard(&quot;AC&quot;); //Admin cancel</span>
+<span class="fc" id="L189">                return false;</span>
+            }
+<span class="fc" id="L191">            counter++;</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">        } while (!Transaction.isCashDivisable(cashAdded, false));</span>
+        // If in correct cash, add to ATM
+<span class="fc" id="L194">        this.updateATMBalance(cashAdded);</span>
+        //Exit
+<span class="fc" id="L196">        System.out.printf(&quot;Routine maintenance completed.\n$%.2f was added to this ATM.%n&quot;, cashAdded);</span>
+<span class="fc" id="L197">        ejectCard(&quot;XX&quot;); // general eject message</span>
+<span class="fc" id="L198">        return true;</span>
+    }
+
+    /*
+    Standard System
+     */
+
+    //Method to display options
+    public void displayOptions(){
+        //display all the options for transactions
+<span class="fc" id="L208">        System.out.println(&quot;\nPlease select one of the options below:&quot;);</span>
+<span class="fc" id="L209">        System.out.println(&quot;&gt;&gt; WITHDRAW from your account      type 1&quot;);</span>
+<span class="fc" id="L210">        System.out.println(&quot;&gt;&gt; DEPOSIT into your account       type 2&quot;);</span>
+<span class="fc" id="L211">        System.out.println(&quot;&gt;&gt; CHECK BALANCE of your account   type 3&quot;);</span>
+<span class="fc" id="L212">        System.out.println(&quot;&gt;&gt; CANCEL and eject your card      type 0&quot;);</span>
+<span class="fc" id="L213">    }</span>
+
+    /**
+     * Allows the user to choose a transaction: withdraw, deposit, check balance or cancel.
+     * Returns true if withdraw or deposit was completed, false if cancel selected.
+    */
+    public boolean runStandardSystem(Customer new_customer){
+        //Welcome Message
+<span class="fc" id="L221">        System.out.println(&quot;\n====== CHOOSE TRANSACTION =====&quot;);</span>
+        /*
+        /   Process Transactions
+        */
+<span class="fc" id="L225">        Scanner tran_scan = new Scanner(System.in);</span>
+        // Ask for a command until they give a correct one
+        while (true) {
+<span class="fc" id="L228">            this.displayOptions();</span>
+            // Changed to entering numbers
+<span class="fc" id="L230">            int tran_type = tran_scan.nextInt();</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">            if (tran_type == 1) {</span>
+<span class="nc" id="L232">                System.out.println(&quot;\n=========== WITHDRAW ==========&quot;);</span>
+                // do withdraw here
+<span class="nc" id="L234">                Withdraw withdraw = new Withdraw(this.getNextTransactionNum(), new_customer, this);</span>
+<span class="nc" id="L235">                withdraw.doTransaction(); // complete function</span>
+<span class="nc" id="L236">                ejectCard(&quot;WD&quot;);</span>
+<span class="nc" id="L237">                return true;</span>
+            }
+<span class="pc bpc" id="L239" title="1 of 2 branches missed.">            else if (tran_type == 2) {</span>
+<span class="nc" id="L240">                System.out.println(&quot;\n=========== DEPOSIT ===========&quot;);</span>
+                // do deposit here
+<span class="nc" id="L242">                Deposit deposit = new Deposit(this.getNextTransactionNum(), new_customer, this);</span>
+<span class="nc" id="L243">                deposit.doTransaction(); // complete function</span>
+<span class="nc" id="L244">                ejectCard(&quot;WD&quot;);</span>
+<span class="nc" id="L245">                return true;</span>
+            }
+<span class="fc bfc" id="L247" title="All 2 branches covered.">            else if (tran_type == 3) {</span>
+<span class="fc" id="L248">                System.out.println(&quot;======== CHECK BALANCE ========&quot;);</span>
+                //do check balance here
+<span class="fc" id="L250">                CheckBalance checkBalance = new CheckBalance(this.getNextTransactionNum(), new_customer, this);</span>
+<span class="fc" id="L251">                checkBalance.doTransaction(); // complete function</span>
+<span class="fc" id="L252">            }</span>
+<span class="fc bfc" id="L253" title="All 2 branches covered.">            else if (tran_type == 0) {</span>
+                // Cancel
+<span class="fc" id="L255">                ejectCard(&quot;CL&quot;);</span>
+<span class="fc" id="L256">                return false;</span>
+            }
+
+<span class="fc" id="L259">        }//while loop end</span>
+
+    }
+
+    /**
+     * Ejects the user's card with a specific message
+    */
+    public void ejectCard(String transType) {
+<span class="fc bfc" id="L267" title="All 4 branches covered.">        switch (transType){</span>
+            case &quot;AC&quot;:  // Admin Cancel
+<span class="fc" id="L269">                System.out.println(&quot;Cancelling routine maintenance...&quot;);</span>
+<span class="fc" id="L270">                break;</span>
+            case &quot;WD&quot;:  // Withdraw and Deposit
+<span class="fc" id="L272">                System.out.println(&quot;Transaction completed. Thank you for choosing XYZ bank.&quot;);</span>
+<span class="fc" id="L273">                break;</span>
+            case &quot;CL&quot;: // Standard user cancel
+<span class="fc" id="L275">                System.out.println(&quot;Cancelling...&quot;);</span>
+                break;
+        }
+<span class="fc" id="L278">        System.out.println(&quot;Your card has been ejected. Have a nice day.&quot;);</span>
+<span class="fc" id="L279">        System.out.println(&quot;============ X Y Z ============&quot;);</span>
+        // System.exit(0);//Exit program
+<span class="fc" id="L281">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

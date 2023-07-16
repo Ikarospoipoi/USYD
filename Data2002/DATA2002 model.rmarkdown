@@ -1,0 +1,470 @@
+---
+title: "Untitled"
+author: '510459602'
+date: "2022-10-16"
+format: 
+  html: 
+    self-contained: true
+    code-fold: true 
+    ### USEFUL ###
+    code-tools: true # Includes a menu to show/hide all chunks
+    ### OPTIONAL ###
+    code-line-numbers: true # Line numbers in code chunks
+    df-print: paged # Sets how dataframes are automatically printed
+    theme: cerulean # Controls the font, colours, etc.
+table-of-contents: true # (Useful) Creates a table of contents!
+number-sections: true # (Optional) Puts numbers next to heading/subheadings
+---
+
+
+## Data Tidying
+
+
+```{r,message=FALSE,warning=FALSE}
+library(tidyverse)
+library(dplyr)
+
+data <- read.delim("bodyfat.txt")
+
+# arrange data in ascending order 
+data_order <- data %>% 
+ arrange(Pct.BF) 
+
+# override weight and height columns in pounds and inches to kilograms and meters, categorise ages, create BMI variable
+data1 <- data_order %>% 
+  mutate(Height = (Height/39.37)) %>%
+  mutate(Weight = (Weight/2.205)) %>%
+  mutate(BMI = (Weight/(Height)^2))
+
+# only keep percentage body fat values greater than 3% (remove two points)
+df <- subset(data1, Pct.BF>=3)
+
+# remove density
+df <- df[ , !names(df) %in% c("Density")] ## works as expected
+
+df2 <- df[ , !names(df) %in% c("Weight")]
+
+df2 <- df2[ , !names(df2) %in% c("Height")]
+
+df2
+
+df3 <- df[ , !names(df) %in% c("BMI")] ## works as expected
+
+df3
+```
+
+
+### Pairs Plot
+
+
+```{r}
+suppressWarnings({ 
+  panel.cor <- function(x, y){
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(0, 1, 0, 1))
+    r <- round(cor(x, y), digits=2)
+    txt <- paste0("R = ", r)
+    text(0.5, 0.5, txt)}
+
+upper.panel <- function(x, y){
+  points(x,y)}
+
+
+pairs(df[,c(1:4, 7:9, 16)], 
+      lower.panel = panel.cor,
+      upper.panel = upper.panel)
+})
+```
+
+
+## Models
+
+Unless the number of candidate variables \> sample size (or number of events), use a backward stepwise approach (<https://quantifyinghealth.com/stepwise-selection/>)
+
+Josh mentioned his group used weight and BMI (indirectly includes height)?? - neither model output includes either variable
+
+### Backward stepwise selection
+
+
+```{r}
+# intercept-only model
+intercept_only <- lm(Pct.BF ~ 1, data = df)
+
+# model with all predictors
+model <- lm(Pct.BF ~ .-1, data = df) #Added intercept back in
+
+# backward stepwise regression
+backward <- step(model, direction = 'backward', scope = formula(model), trace = TRUE)
+
+# results 
+backward$anova
+
+# final model
+backward$coefficients
+
+summary(backward) #Added summary to examine P values
+```
+
+
+Model:
+
+pct.bf \~
+
+### Backward stepwise selection (plot method/same result)
+
+
+```{r,warning=FALSE,message=FALSE}
+library(olsrr)
+
+model <- lm(Pct.BF ~ ., data = df)
+
+ols_step_backward_aic(model)
+a <- ols_step_backward_aic(model)
+
+# stepwise backward regression plot
+plot(a)
+
+# final model 
+a$model
+
+```
+
+
+Model:
+
+pct.bf \~ 449.55 - 415.14\*density + 0.01500\*age + 0.04816\*chest + 0.04140\*hip - 0.05793\*bicep
+
+### Forward stepwise selection
+
+
+```{r}
+
+# intercept-only model
+intercept_only <- lm(Pct.BF ~ 1, data = df)
+
+# model with all predictors
+model <- lm(Pct.BF ~ ., data = df)
+
+# forward stepwise regression
+forward <- step(intercept_only, direction = 'forward', scope = formula(model), trace = TRUE)
+
+forward <- step(intercept_only, direction = 'forward', scope = formula(model), trace = 0)
+
+# results 
+forward$anova
+
+# final model
+forward$coefficients
+
+
+
+```
+
+
+Model:
+
+pct.bf \~ 445.22 - 409.17\*density + 0.057464\*abdomen + 0.011260\*age
+
+
+```{r}
+# if cannot implement, install.package('ggfortify')
+library(ggfortify)
+# determine log(k) k Value
+nrow(df)
+M1 <- lm(Pct.BF ~ ., data = df) 
+
+# Doing BIC
+M1.step <- step(M1, 
+                scope = list(lower = df ~ 1, 
+                             upper = df ~ .),
+               direction = "backward", k = log(248))
+
+# sumary of bic
+summary(M1.step)
+# graph of bic
+autoplot(M1.step)
+```
+
+
+## Performance
+
+
+```{r}
+# Forward AIC model
+# PCT.bf ~  Waist + Weight + Wrist + BMI + Age + Chest
+forward_value = round(summary(forward)$r.squared,3) 
+
+# Backward AIC model
+# PCT.bf ~ Age + Neck + Chest + Abdomen + Hip + Forearm + Wrist + BMI
+backward_value = round(summary(backward)$r.squared,3)
+```
+
+
+### In sample
+
+The forward AIC model has an R-squared value of `r forward_value` while the backward model has an value of `r backward_value`. It seems that backward AIC models fits the dataset a little better.
+
+
+```{r}
+sjPlot::tab_model(forward,backward,show.ci = FALSE,dv.labels = c("Forward model", "Backward model"))
+```
+
+
+### Out of sample
+
+We use 10 fold cross validation here over 5 fold since there are 248 observations in the dataset and we allow more observations to train the model. Using 10 fold cross validation, the backward AIC model has slight advantage over forward AIC as shown below.
+
+
+```{r,message=FALSE}
+library(caret)
+set.seed(1)
+
+# 10 fold cross validation
+ten_fold = trainControl(
+    method = "cv", number = 10,
+    verboseIter = FALSE
+  )
+
+# forward model
+cv_forward = train(
+  Pct.BF ~  Waist + Weight + Wrist + BMI + Age + Chest, df,
+  method = "lm",
+  trControl = ten_fold
+)
+
+cv_backward = train(
+  Pct.BF ~ Age + Neck + Chest + Abdomen + Hip + Forearm + Wrist + BMI, df,
+  method = "lm",
+  trControl = ten_fold
+)
+Method = c("forward AIC","backward AIC")
+RMSE = c(cv_forward$results$RMSE,cv_backward$results$RMSE)
+MAE  = c(cv_forward$results$MAE,cv_backward$results$MAE)
+knitr::kable(data.frame(Method, RMSE,MAE))
+
+
+```
+
+```{r}
+set.seed(1)
+results <- resamples(list(Forward_AIC = cv_forward, Backward_AIC = cv_backward))
+
+# put into a dataframe
+mae = c(results$values$`Forward_AIC~MAE`,results$values$`Backward_AIC~MAE`)
+rmse = c(results$values$`Forward_AIC~RMSE`,results$values$`Backward_AIC~RMSE`)
+combine = data.frame(mae,rmse)
+combine = combine%>% mutate(type = c(rep("Forward_AIC",10),rep("Backward_AIC",10)))
+colnames(combine) <- c('MAE','RMSE','type')
+
+# draw the plot
+p1 = plotly::ggplotly(ggplot(combine,aes(x = type,y=MAE,color=type)) +geom_boxplot()+
+  labs(y = "MAE")+theme_light()+theme(axis.title.y = element_blank())+coord_flip())
+
+p2 = plotly::ggplotly(ggplot(combine,aes(x = type,y=RMSE,color=type)) +geom_boxplot()+
+  labs(y = "RMSE")+theme_light()+theme(axis.title.y = element_blank())+coord_flip())
+
+manipulateWidget::combineWidgets(p1, p2, nrow = 2)
+```
+
+```{r}
+# # 10 fold cross validation
+# ten_fold = trainControl(
+#     method = "cv", number = 5,
+#     verboseIter = FALSE
+#   )
+# 
+# # forward model
+# cv_forward_five = train(
+#   Pct.BF ~  Waist + Weight + Wrist + BMI + Age + Chest, df,
+#   method = "lm",
+#   trControl = ten_fold
+# )
+# 
+# cv_backward_five = train(
+#   Pct.BF ~ Age + Neck + Chest + Abdomen + Hip + Forearm + Wrist + BMI, df,
+#   method = "lm",
+#   trControl = ten_fold
+# )
+# Method = c("forward AIC","backward AIC")
+# RMSE = c(cv_forward_five$results$RMSE,cv_backward_five$results$RMSE)
+# MAE  = c(cv_forward_five$results$MAE,cv_backward_five$results$MAE)
+# knitr::kable(data.frame(Method, RMSE,MAE))
+
+```
+
+```{r}
+
+# intercept-only model
+intercept_only <- lm(Pct.BF ~ 1, data = df)
+
+# model with all predictors
+model_intercept <- lm(Pct.BF ~ ., data = df3) #Added intercept back in
+
+#no intercept model
+
+model_nointercept <- lm(Pct.BF ~ .-1, data = df3)
+
+# backward stepwise regression 1
+backward_intercept_aic <- step(model_intercept, direction = 'backward', scope = formula(model_intercept), trace = FALSE)
+
+backward_nointercept_aic <- step(model_nointercept, direction = 'backward', scope = formula(model_nointercept), trace = FALSE)
+
+summary(backward_intercept_aic)
+
+summary(backward_nointercept_aic)
+
+```
+
+```{r}
+model_bmi_intercept <- lm(Pct.BF ~ ., data = df2)
+
+model_bmi_nointercept <- lm(Pct.BF ~ .-1, data = df2)
+
+backward_bmi_intercept <- step(model_bmi_intercept, direction = 'backward', scope = formula(model_bmi_intercept), trace = FALSE)
+
+backward_bmi_nointercept <- step(model_bmi_nointercept, direction = 'backward', scope = formula(model_bmi_nointercept), trace = FALSE)
+
+summary(backward_bmi_intercept)
+
+summary(backward_bmi_nointercept)
+
+```
+
+```{r}
+
+model_nointercept <- lm(Pct.BF ~ .-1, data = df3)
+
+
+backward_nointercept_aic <- step(model_nointercept, direction = 'backward', scope = formula(model_nointercept), trace = FALSE)
+
+summary(backward_nointercept_aic)
+
+
+backward_nointercept_bic <- step(model_nointercept, direction = 'backward', scope = formula(model_nointercept), trace = FALSE, k=log(248))
+
+summary(backward_nointercept_bic)
+
+
+
+```
+
+```{r}
+library(caret)
+set.seed(1)
+
+
+cv_full_aic = train(
+  Pct.BF ~ Age + Height + Neck + Abdomen + Forearm + 
+    Wrist - 1, df3,
+  method = "lm",
+  trControl = trainControl(
+    method = "cv", number = 10,
+    verboseIter = FALSE
+  )
+)
+cv_full_aic
+
+cv_full_bic = train(
+  Pct.BF ~ Age + Height + Abdomen + Wrist - 1, df3,
+  method = "lm",
+  trControl = trainControl(
+    method = "cv", number = 10,
+    verboseIter = FALSE
+  )
+)
+
+cv_full_bic
+
+results <- resamples(list(AIC = cv_full_aic,  BIC = cv_full_bic))
+
+ggplot(results, metric = "MAE") +
+  labs(y = "MAE")
+
+ggplot(results, metric = "RMSE") +
+  labs(y = "RMSE")
+
+ggplot(results, metric = "Rsquared") +
+  labs(y = "Rsquared")
+
+
+```
+
+## Assumptions
+
+### Linearity
+Based on the plot showing residuals vs fitted values, the horizonal line seems fine until the end where it starts the decline abit. With further analysis of each variable plotted against body fat percentage we can see that the values seem pretty equal above and below the line therefore indicating linearity.
+
+```{r}
+plot(backward_nointercept_aic, 1)
+
+data %>% ggplot() + aes(x = Age, y = Pct.BF) + geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE)
+data %>% ggplot() + aes(x = Wrist, y = Pct.BF) + geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE)
+data %>% ggplot() + aes(x = Chest, y = Pct.BF) + geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE)
+data %>% ggplot() + aes(x = Neck, y = Pct.BF) + geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE)
+data %>% ggplot() + aes(x = Abdomen, y = Pct.BF) + geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE)
+data %>% ggplot() + aes(x = Hip, y = Pct.BF) + geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE)
+data %>% ggplot() + aes(x = Forearm, y = Pct.BF) + geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE)
+
+
+
+
+
+```
+
+
+### Normality
+Plotting the standardised residuals against on a qq plot shows values fairly close to the line indicating normality. The end portion is kind of a worry however due to CLT, as we have a large amount of observations we can assume normality.
+
+```{r}
+plot(backward_nointercept_aic, 2)
+
+
+
+
+```
+
+### Homoscedasticity
+
+Plotting fitted values against the standardized residuals shows points fairly equal above and below the line therefore indicating homoscedasticity or equal variances between groups.
+
+```{r}
+plot(backward_nointercept_aic, 3)
+```
+
+
+### Cook's Distance
+
+```{r}
+library(sjPlot)
+library(broom)
+plot(backward_nointercept_bic, 5, id.n = 3)
+model_metrics <- augment(backward_nointercept_bic) 
+model_metrics
+remove = model_metrics %>%
+  top_n(3, wt = .cooksd)
+
+remove
+
+df4 <- df3[!(row.names(df3) %in% c('212','221', '245')), ]
+df4
+
+Cmodel_nointercept <- lm(Pct.BF ~ .-1, data = df4)
+
+Cbackward_nointercept_bic <- step(Cmodel_nointercept, direction = 'backward', scope = formula(Cmodel_nointercept), trace = FALSE, k=log(248))
+
+summary(Cbackward_nointercept_bic)
+
+tab_model(backward_nointercept_bic, Cbackward_nointercept_bic, show.ci = FALSE, show.aic = TRUE, dv.labels = c("Backward Model no intercept", "Backward Model Cooks Distance")) #Backward model seems better
+
+cv_full_cbic = train(
+  Pct.BF ~ Age + Height + Abdomen + Wrist - 1, df4,
+  method = "lm",
+  trControl = trainControl(
+    method = "cv", number = 10,
+    verboseIter = FALSE
+  )
+)
+cv_full_cbic
+
+```
+

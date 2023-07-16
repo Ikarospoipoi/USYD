@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="A1.ATMTest" tests="35" skipped="0" failures="0" errors="0" timestamp="2021-09-24T06:37:46" hostname="Rachels-MacBook-Air-3.local" time="22.598">
+  <properties/>
+  <testcase name="userEjectCard()" classname="A1.ATMTest" time="0.367"/>
+  <testcase name="constructorZeroBalance()" classname="A1.ATMTest" time="0.306"/>
+  <testcase name="adminEjectCard()" classname="A1.ATMTest" time="0.304"/>
+  <testcase name="lateStartInitCust()" classname="A1.ATMTest" time="0.654"/>
+  <testcase name="tooLongInitCust()" classname="A1.ATMTest" time="0.434"/>
+  <testcase name="cancelAdmin()" classname="A1.ATMTest" time="0.348"/>
+  <testcase name="nonCashCancelAdmin()" classname="A1.ATMTest" time="0.338"/>
+  <testcase name="adminInitCust()" classname="A1.ATMTest" time="1.252"/>
+  <testcase name="lostInitCust()" classname="A1.ATMTest" time="1.281"/>
+  <testcase name="nonCashTwiceCorrectOnceAdmin()" classname="A1.ATMTest" time="0.429"/>
+  <testcase name="stolenInitCust()" classname="A1.ATMTest" time="1.252"/>
+  <testcase name="cancelStdSystem()" classname="A1.ATMTest" time="0.974"/>
+  <testcase name="checkBalCancelStdSystem()" classname="A1.ATMTest" time="1.078"/>
+  <testcase name="negFractionUpdateBalance()" classname="A1.ATMTest" time="0.553"/>
+  <testcase name="userCardNumTest()" classname="A1.ATMTest" time="0.305"/>
+  <testcase name="displayOptionsTest()" classname="A1.ATMTest" time="0.317"/>
+  <testcase name="zeroUpdateBalance()" classname="A1.ATMTest" time="0.487"/>
+  <testcase name="invalidCancelStdSystem()" classname="A1.ATMTest" time="0.94"/>
+  <testcase name="tooShortInitCust()" classname="A1.ATMTest" time="0.455"/>
+  <testcase name="wdEjectCard()" classname="A1.ATMTest" time="0.31"/>
+  <testcase name="cashAdmin()" classname="A1.ATMTest" time="0.428"/>
+  <testcase name="garbageInitCust()" classname="A1.ATMTest" time="0.473"/>
+  <testcase name="otherEjectCard()" classname="A1.ATMTest" time="0.369"/>
+  <testcase name="correctSecondAttemptPIN()" classname="A1.ATMTest" time="1.046"/>
+  <testcase name="posFractionUpdateBalance()" classname="A1.ATMTest" time="0.649"/>
+  <testcase name="earlyExpiryInitCust()" classname="A1.ATMTest" time="0.642"/>
+  <testcase name="correctPIN()" classname="A1.ATMTest" time="1.004"/>
+  <testcase name="standardInitCust()" classname="A1.ATMTest" time="1.337"/>
+  <testcase name="emptyInitCust()" classname="A1.ATMTest" time="0.963"/>
+  <testcase name="userCardNumZeroStart()" classname="A1.ATMTest" time="0.303"/>
+  <testcase name="incorrectPIN()" classname="A1.ATMTest" time="1.091"/>
+  <testcase name="negIntUpdateBalance()" classname="A1.ATMTest" time="0.517"/>
+  <testcase name="constructorNormal()" classname="A1.ATMTest" time="0.411"/>
+  <testcase name="nonExistentInitCust()" classname="A1.ATMTest" time="0.421"/>
+  <testcase name="posIntUpdateBalance()" classname="A1.ATMTest" time="0.52"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

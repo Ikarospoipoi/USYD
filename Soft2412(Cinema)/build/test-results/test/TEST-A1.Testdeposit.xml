@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="A1.Testdeposit" tests="4" skipped="0" failures="0" errors="0" timestamp="2021-09-24T06:38:09" hostname="Rachels-MacBook-Air-3.local" time="4.726">
+  <properties/>
+  <testcase name="update()" classname="A1.Testdeposit" time="1.82"/>
+  <testcase name="testuserinput_amount()" classname="A1.Testdeposit" time="0.965"/>
+  <testcase name="testprint_receipt()" classname="A1.Testdeposit" time="0.955"/>
+  <testcase name="testuserinput_valid()" classname="A1.Testdeposit" time="0.982"/>
+  <system-out><![CDATA[You may only deposit AUD notes. Coins are not accepted.
+>> ENTER AMOUNT TO DEPOSIT
+** Press 0 to CANCEL deposit and go back to the menu **
+Success! You have deposited $500.00 into your account.
+||      XYZ Bank - RECEIPT
+||  Transaction ID:     728
+||  Transaction type:   DEPOSIT
+||  Deposit amount:     500.0
+||  Account balance:    115162.0
+Success! You have deposited $0.00 into your account.
+||      XYZ Bank - RECEIPT
+||  Transaction ID:     729
+||  Transaction type:   DEPOSIT
+||  Deposit amount:     0.0
+||  Account balance:    115162.0
+You may only deposit AUD notes. Coins are not accepted.
+>> ENTER AMOUNT TO DEPOSIT
+** Press 0 to CANCEL deposit and go back to the menu **
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
